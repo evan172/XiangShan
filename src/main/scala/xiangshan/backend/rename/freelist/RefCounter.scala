@@ -48,8 +48,8 @@ class RefCounter(size: Int)(implicit p: Parameters) extends XSModule {
     val hasDuplicate = deallocate.take(i).map(de => de.valid && de.bits === deallocate(i).bits)
     val blockedByDup = if (i == 0) false.B else VecInit(hasDuplicate).asUInt.orR
     val isFreed = refCounter(RegNext(de.bits)) === 0.U
-    io.freeRegs(i).valid := RegNext(isNonZero && !blockedByDup) && isFreed
-    io.freeRegs(i).bits := RegNext(deallocate(i).bits)
+    io.freeRegs(i).valid := RegNext(RegNext(isNonZero && !blockedByDup) && isFreed)
+    io.freeRegs(i).bits := RegNext(RegNext(deallocate(i).bits))
   }
 
   /**
